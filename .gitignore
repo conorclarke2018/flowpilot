@@ -1,0 +1,31 @@
+# Env
+.env
+.env.local
+
+# Node
+node_modules/
+apps/web/dist/
+.pnpm-store/
+
+# Python
+services/api/.venv/
+**/__pycache__/
+*.pyc
+
+# Terraform
+infra/terraform/.terraform/
+infra/terraform/*.tfstate
+infra/terraform/*.tfstate.backup
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# Ruflo / local tooling artifacts
+.claude-flow/
+.swarm/
+ruvector.db
+
+# Logs
+*.log

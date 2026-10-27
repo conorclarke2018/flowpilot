@@ -1,0 +1,10 @@
+{
+  "name": "flowpilot",
+  "private": true,
+  "packageManager": "pnpm@12.15.0",
+  "scripts": {
+    "dev:web": "pnpm --filter web dev",
+    "lint:web": "pnpm --filter web lint",
+    "typecheck:web": "pnpm --filter web typecheck"
+  }
+}
