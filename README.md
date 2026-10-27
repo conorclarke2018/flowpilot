@@ -12,13 +12,29 @@ Product spec and planning history: [docs/flowpilot-chat-history.md](docs/flowpil
 
 ## Local development
 
+### Option A — Docker Compose (closest to production)
+
 ```bash
 cp .env.example .env
 docker compose up --build
+docker exec saasproject-api-1 uv run alembic upgrade head
+```
+
+### Option B — native, faster reloads
+
+Requires Postgres + Redis running locally (e.g. `docker compose up -d postgres redis`) and the API deps synced (`cd services/api && uv sync`).
+
+```bash
+pnpm install
+pnpm dev          # runs the Vite dev server and FastAPI (uvicorn --reload) together
+pnpm run dev:worker   # in a second terminal, if you need Celery/background runs
 ```
 
 - Web: http://localhost:5173
 - API: http://localhost:8000/api/v1/health
+- Interactive API docs: http://localhost:8000/docs
+
+Other root scripts: `pnpm test:api`, `pnpm lint` (web + api), `pnpm typecheck:web`, `pnpm build:web`.
 
 ## Repository layout
 

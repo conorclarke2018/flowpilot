@@ -3,8 +3,18 @@
   "private": true,
   "packageManager": "pnpm@12.15.0",
   "scripts": {
+    "dev": "concurrently -n web,api -c blue,green \"pnpm run dev:web\" \"pnpm run dev:api\"",
     "dev:web": "pnpm --filter web dev",
+    "dev:api": "cd services/api && uv run uvicorn app.main:app --reload --port 8000",
+    "dev:worker": "cd services/api && uv run celery -A app.workers.celery_app worker --loglevel=info",
+    "build:web": "pnpm --filter web build",
+    "lint": "pnpm run lint:web && pnpm run lint:api",
     "lint:web": "pnpm --filter web lint",
-    "typecheck:web": "pnpm --filter web typecheck"
+    "lint:api": "cd services/api && uv run ruff check .",
+    "typecheck:web": "pnpm --filter web typecheck",
+    "test:api": "cd services/api && uv run pytest"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
   }
 }

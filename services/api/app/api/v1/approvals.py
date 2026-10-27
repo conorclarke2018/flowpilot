@@ -1,31 +1,30 @@
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, HTTPException, Query
 
-from app.db.session import get_db
+from app.api.deps import SessionDep
 from app.schemas.api import ApprovalDecisionRequest, ApprovalResponse
 from app.services import approvals as approval_service
 from app.services.approvals import ApprovalAlreadyDecidedError, ApprovalNotFoundError
 from app.workers.tasks import execute_run_task
 
-router = APIRouter()
+router = APIRouter(prefix="/approvals", tags=["approvals"])
 
 
-@router.get("/approvals", response_model=list[ApprovalResponse])
+@router.get("", response_model=list[ApprovalResponse])
 async def list_pending_approvals(
-    workspace_id: uuid.UUID = Query(...), db: Session = Depends(get_db)
+    db: SessionDep, workspace_id: uuid.UUID = Query(...)
 ) -> list[ApprovalResponse]:
     approvals = approval_service.list_pending_approvals(db, workspace_id=workspace_id)
     return [ApprovalResponse.model_validate(a, from_attributes=True) for a in approvals]
 
 
-@router.post("/approvals/{approval_id}/decision", response_model=ApprovalResponse)
+@router.post("/{approval_id}/decision", response_model=ApprovalResponse)
 async def decide_approval(
     approval_id: uuid.UUID,
     payload: ApprovalDecisionRequest,
+    db: SessionDep,
     workspace_id: uuid.UUID = Query(...),
-    db: Session = Depends(get_db),
 ) -> ApprovalResponse:
     try:
         approval = approval_service.decide_approval(

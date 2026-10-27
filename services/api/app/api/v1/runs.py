@@ -1,24 +1,23 @@
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, HTTPException, Query
 
-from app.db.session import get_db
+from app.api.deps import SessionDep
 from app.schemas.api import NodeRunResponse, RunCreateRequest, RunResponse
 from app.services import runs as run_service
 from app.services.runs import RunNotFoundError, WorkflowNotPublishedError
 from app.services.workflows import WorkflowNotFoundError
 from app.workers.tasks import execute_run_task
 
-router = APIRouter()
+router = APIRouter(tags=["runs"])
 
 
 @router.post("/workflows/{workflow_id}/runs", response_model=RunResponse, status_code=202)
 async def create_run(
     workflow_id: uuid.UUID,
     payload: RunCreateRequest,
+    db: SessionDep,
     workspace_id: uuid.UUID = Query(...),
-    db: Session = Depends(get_db),
 ) -> RunResponse:
     try:
         run = run_service.create_run(
@@ -44,7 +43,7 @@ async def create_run(
 
 @router.get("/runs/{run_id}", response_model=RunResponse)
 async def get_run(
-    run_id: uuid.UUID, workspace_id: uuid.UUID = Query(...), db: Session = Depends(get_db)
+    run_id: uuid.UUID, db: SessionDep, workspace_id: uuid.UUID = Query(...)
 ) -> RunResponse:
     try:
         run = run_service.get_run(db, workspace_id=workspace_id, run_id=run_id)
@@ -55,7 +54,7 @@ async def get_run(
 
 @router.get("/runs/{run_id}/nodes", response_model=list[NodeRunResponse])
 async def get_run_nodes(
-    run_id: uuid.UUID, workspace_id: uuid.UUID = Query(...), db: Session = Depends(get_db)
+    run_id: uuid.UUID, db: SessionDep, workspace_id: uuid.UUID = Query(...)
 ) -> list[NodeRunResponse]:
     try:
         node_runs = run_service.list_node_runs(db, workspace_id=workspace_id, run_id=run_id)

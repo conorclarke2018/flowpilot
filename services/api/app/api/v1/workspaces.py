@@ -1,17 +1,14 @@
-from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
+from fastapi import APIRouter
 
-from app.db.session import get_db
+from app.api.deps import SessionDep
 from app.models.workspace import Workspace
 from app.schemas.api import WorkspaceCreateRequest, WorkspaceResponse
 
-router = APIRouter()
+router = APIRouter(prefix="/workspaces", tags=["workspaces"])
 
 
-@router.post("/workspaces", response_model=WorkspaceResponse, status_code=201)
-async def create_workspace(
-    payload: WorkspaceCreateRequest, db: Session = Depends(get_db)
-) -> Workspace:
+@router.post("", response_model=WorkspaceResponse, status_code=201)
+async def create_workspace(payload: WorkspaceCreateRequest, db: SessionDep) -> Workspace:
     workspace = Workspace(name=payload.name)
     db.add(workspace)
     db.commit()

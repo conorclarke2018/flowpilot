@@ -1,11 +1,8 @@
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, HTTPException, Query
 
-from app.db.session import get_db
-from app.providers.base import ModelProvider
-from app.providers.factory import get_provider
+from app.api.deps import ProviderDep, SessionDep
 from app.schemas.api import (
     GenerateWorkflowRequest,
     GenerateWorkflowResponse,
@@ -20,13 +17,11 @@ from app.services import workflows as workflow_service
 from app.services.generation import generate_workflow_proposal
 from app.services.workflows import PublishValidationError, WorkflowNotFoundError
 
-router = APIRouter()
+router = APIRouter(prefix="/workflows", tags=["workflows"])
 
 
-@router.post("/workflows", response_model=WorkflowResponse, status_code=201)
-async def create_workflow(
-    payload: WorkflowCreateRequest, db: Session = Depends(get_db)
-) -> WorkflowResponse:
+@router.post("", response_model=WorkflowResponse, status_code=201)
+async def create_workflow(payload: WorkflowCreateRequest, db: SessionDep) -> WorkflowResponse:
     workflow = workflow_service.create_workflow(
         db,
         workspace_id=payload.workspace_id,
@@ -37,17 +32,17 @@ async def create_workflow(
     return WorkflowResponse.model_validate(workflow, from_attributes=True)
 
 
-@router.get("/workflows", response_model=list[WorkflowResponse])
+@router.get("", response_model=list[WorkflowResponse])
 async def list_workflows(
-    workspace_id: uuid.UUID = Query(...), db: Session = Depends(get_db)
+    db: SessionDep, workspace_id: uuid.UUID = Query(...)
 ) -> list[WorkflowResponse]:
     workflows = workflow_service.list_workflows(db, workspace_id=workspace_id)
     return [WorkflowResponse.model_validate(w, from_attributes=True) for w in workflows]
 
 
-@router.get("/workflows/{workflow_id}", response_model=WorkflowResponse)
+@router.get("/{workflow_id}", response_model=WorkflowResponse)
 async def get_workflow(
-    workflow_id: uuid.UUID, workspace_id: uuid.UUID = Query(...), db: Session = Depends(get_db)
+    workflow_id: uuid.UUID, db: SessionDep, workspace_id: uuid.UUID = Query(...)
 ) -> WorkflowResponse:
     try:
         workflow = workflow_service.get_workflow(
@@ -58,12 +53,12 @@ async def get_workflow(
     return WorkflowResponse.model_validate(workflow, from_attributes=True)
 
 
-@router.put("/workflows/{workflow_id}", response_model=WorkflowResponse)
+@router.put("/{workflow_id}", response_model=WorkflowResponse)
 async def update_workflow_draft(
     workflow_id: uuid.UUID,
     payload: WorkflowUpdateRequest,
+    db: SessionDep,
     workspace_id: uuid.UUID = Query(...),
-    db: Session = Depends(get_db),
 ) -> WorkflowResponse:
     try:
         workflow = workflow_service.update_draft(
@@ -77,9 +72,9 @@ async def update_workflow_draft(
     return WorkflowResponse.model_validate(workflow, from_attributes=True)
 
 
-@router.post("/workflows/{workflow_id}/validate", response_model=ValidationResponse)
+@router.post("/{workflow_id}/validate", response_model=ValidationResponse)
 async def validate_workflow_draft(
-    workflow_id: uuid.UUID, workspace_id: uuid.UUID = Query(...), db: Session = Depends(get_db)
+    workflow_id: uuid.UUID, db: SessionDep, workspace_id: uuid.UUID = Query(...)
 ) -> ValidationResponse:
     try:
         result = workflow_service.validate_draft(
@@ -93,9 +88,9 @@ async def validate_workflow_draft(
     )
 
 
-@router.post("/workflows/{workflow_id}/publish", response_model=WorkflowVersionResponse)
+@router.post("/{workflow_id}/publish", response_model=WorkflowVersionResponse)
 async def publish_workflow(
-    workflow_id: uuid.UUID, workspace_id: uuid.UUID = Query(...), db: Session = Depends(get_db)
+    workflow_id: uuid.UUID, db: SessionDep, workspace_id: uuid.UUID = Query(...)
 ) -> WorkflowVersionResponse:
     try:
         version = workflow_service.publish_workflow(
@@ -106,20 +101,18 @@ async def publish_workflow(
     except PublishValidationError as exc:
         raise HTTPException(
             status_code=422,
-            detail=[
-                {"code": e.code, "message": e.message} for e in exc.result.errors
-            ],
+            detail=[{"code": e.code, "message": e.message} for e in exc.result.errors],
         ) from None
     return WorkflowVersionResponse.model_validate(version, from_attributes=True)
 
 
-@router.post("/workflows/{workflow_id}/generate", response_model=GenerateWorkflowResponse)
+@router.post("/{workflow_id}/generate", response_model=GenerateWorkflowResponse)
 async def generate_workflow(
     workflow_id: uuid.UUID,
     payload: GenerateWorkflowRequest,
+    db: SessionDep,
+    provider: ProviderDep,
     workspace_id: uuid.UUID = Query(...),
-    db: Session = Depends(get_db),
-    provider: ModelProvider = Depends(get_provider),
 ) -> GenerateWorkflowResponse:
     try:
         workflow_service.get_workflow(db, workspace_id=workspace_id, workflow_id=workflow_id)
