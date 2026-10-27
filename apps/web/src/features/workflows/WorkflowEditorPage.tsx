@@ -9,6 +9,7 @@ import {
   type Connection,
   Controls,
   type Edge,
+  MarkerType,
   type Node,
   type OnConnect,
   ReactFlow,
@@ -20,6 +21,8 @@ import { useParams } from "react-router-dom";
 
 import { NodeConfigPanel } from "../../components/workflow-editor/NodeConfigPanel";
 import { NodePalette } from "../../components/workflow-editor/NodePalette";
+import { nodeTypes, WORKFLOW_NODE_TYPE } from "../../components/workflow-editor/nodeTypes";
+import type { WorkflowNodeData } from "../../components/workflow-editor/WorkflowNode";
 import { TestRunPanel } from "../../components/execution-viewer/TestRunPanel";
 import { ApiError } from "../../lib/api/client";
 import {
@@ -31,11 +34,7 @@ import {
 import { useWorkspaceId } from "../../lib/workspace";
 import type { NodeType, ValidationError, WorkflowDefinition } from "../../types/workflow";
 
-interface FlowNodeData {
-  nodeType: NodeType;
-  config: Record<string, unknown>;
-  [key: string]: unknown;
-}
+type FlowNodeData = WorkflowNodeData;
 
 function definitionToFlow(definition: WorkflowDefinition): {
   nodes: Node<FlowNodeData>[];
@@ -44,8 +43,9 @@ function definitionToFlow(definition: WorkflowDefinition): {
   return {
     nodes: definition.nodes.map((node) => ({
       id: node.id,
+      type: WORKFLOW_NODE_TYPE,
       position: node.position,
-      data: { nodeType: node.type, config: node.config, label: `${node.type}\n${node.id}` },
+      data: { nodeType: node.type, config: node.config },
     })),
     edges: definition.edges.map((edge) => ({
       id: edge.id,
@@ -120,8 +120,9 @@ export function WorkflowEditorPage() {
         ...current,
         {
           id,
+          type: WORKFLOW_NODE_TYPE,
           position: { x: 80 + current.length * 40, y: 80 + current.length * 60 },
-          data: { nodeType, config: {}, label: `${nodeType}\n${id}` },
+          data: { nodeType, config: {} },
         },
       ]);
     },
@@ -220,13 +221,13 @@ export function WorkflowEditorPage() {
           )}
         </Group>
         <Group gap="xs">
-          <Button size="xs" variant="light" loading={saveMutation.isPending} onClick={() => saveMutation.mutate()}>
+          <Button size="sm" variant="light" loading={saveMutation.isPending} onClick={() => saveMutation.mutate()}>
             Save draft
           </Button>
-          <Button size="xs" variant="light" loading={validateMutation.isPending} onClick={() => validateMutation.mutate()}>
+          <Button size="sm" variant="light" loading={validateMutation.isPending} onClick={() => validateMutation.mutate()}>
             Validate
           </Button>
-          <Button size="xs" loading={publishMutation.isPending} onClick={() => publishMutation.mutate()}>
+          <Button size="sm" loading={publishMutation.isPending} onClick={() => publishMutation.mutate()}>
             Publish
           </Button>
         </Group>
@@ -251,6 +252,11 @@ export function WorkflowEditorPage() {
           <ReactFlow
             nodes={nodes}
             edges={edges}
+            nodeTypes={nodeTypes}
+            defaultEdgeOptions={{
+              style: { stroke: "#868e96", strokeWidth: 1.5 },
+              markerEnd: { type: MarkerType.ArrowClosed, color: "#868e96" },
+            }}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}

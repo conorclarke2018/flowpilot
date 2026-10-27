@@ -45,6 +45,7 @@ function ApprovalCard({ approval, workspaceId }: { approval: Approval; workspace
         <Badge size="xs">run {approval.workflow_run_id.slice(0, 8)}</Badge>
       </Group>
       <Textarea
+        label="Proposed payload (JSON) — edit before approving if needed"
         autosize
         minRows={4}
         value={text}
@@ -53,14 +54,14 @@ function ApprovalCard({ approval, workspaceId }: { approval: Approval; workspace
       />
       <Group gap="xs">
         <Button
-          size="xs"
+          size="sm"
           loading={decide.isPending && decide.variables === "approved"}
           onClick={() => decide.mutate("approved")}
         >
           Approve
         </Button>
         <Button
-          size="xs"
+          size="sm"
           color="red"
           variant="light"
           loading={decide.isPending && decide.variables === "rejected"}

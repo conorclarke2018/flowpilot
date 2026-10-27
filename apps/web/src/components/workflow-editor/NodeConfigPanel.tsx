@@ -40,6 +40,7 @@ export function NodeConfigPanel({
         {nodeId}
       </Text>
       <Textarea
+        label="Node configuration (JSON)"
         autosize
         minRows={8}
         value={text}
