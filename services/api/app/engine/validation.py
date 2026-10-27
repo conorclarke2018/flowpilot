@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from app.engine.registry import NODE_TYPES, TRIGGER_NODE_TYPES
-from app.schemas.workflow import WorkflowDefinition
+from app.schemas.workflow_definition import WorkflowDefinition
 
 
 @dataclass(frozen=True)

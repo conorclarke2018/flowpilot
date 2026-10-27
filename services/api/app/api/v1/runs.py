@@ -3,7 +3,7 @@ import uuid
 from fastapi import APIRouter, HTTPException, Query
 
 from app.api.deps import SessionDep
-from app.schemas.api import NodeRunResponse, RunCreateRequest, RunResponse
+from app.schemas.run import NodeRunResponse, RunCreateRequest, RunResponse
 from app.services import runs as run_service
 from app.services.runs import RunNotFoundError, WorkflowNotPublishedError
 from app.services.workflows import WorkflowNotFoundError

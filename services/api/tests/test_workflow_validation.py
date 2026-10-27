@@ -1,5 +1,5 @@
 from app.engine.validation import validate_workflow
-from app.schemas.workflow import WorkflowDefinition, WorkflowEdge, WorkflowNode
+from app.schemas.workflow_definition import WorkflowDefinition, WorkflowEdge, WorkflowNode
 
 POSITION = {"x": 0, "y": 0}
 

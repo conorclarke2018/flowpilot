@@ -1,38 +1,58 @@
-from typing import Any
+import uuid
+from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel
 
-SCHEMA_VERSION = "1.0"
-
-
-class NodePosition(BaseModel):
-    x: float
-    y: float
+from app.schemas.workflow_definition import WorkflowDefinition
 
 
-class WorkflowNode(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    id: str
-    type: str
-    position: NodePosition
-    config: dict[str, Any] = Field(default_factory=dict)
-
-
-class WorkflowEdge(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    id: str
-    source: str
-    source_handle: str = "output"
-    target: str
-    target_handle: str = "input"
-
-
-class WorkflowDefinition(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    schema_version: str = SCHEMA_VERSION
+class WorkflowCreateRequest(BaseModel):
+    workspace_id: uuid.UUID
     name: str
-    nodes: list[WorkflowNode] = Field(default_factory=list)
-    edges: list[WorkflowEdge] = Field(default_factory=list)
+    description: str | None = None
+    definition: WorkflowDefinition
+
+
+class WorkflowUpdateRequest(BaseModel):
+    definition: WorkflowDefinition
+
+
+class WorkflowResponse(BaseModel):
+    id: uuid.UUID
+    workspace_id: uuid.UUID
+    name: str
+    description: str | None
+    draft_definition: WorkflowDefinition
+    draft_revision: int
+    published_version: int | None
+    created_at: datetime
+    updated_at: datetime
+
+
+class ValidationErrorResponse(BaseModel):
+    code: str
+    message: str
+
+
+class ValidationResponse(BaseModel):
+    is_valid: bool
+    errors: list[ValidationErrorResponse]
+
+
+class WorkflowVersionResponse(BaseModel):
+    id: uuid.UUID
+    workflow_id: uuid.UUID
+    version: int
+    definition: WorkflowDefinition
+    created_at: datetime
+
+
+class GenerateWorkflowRequest(BaseModel):
+    prompt: str
+
+
+class GenerateWorkflowResponse(BaseModel):
+    definition: WorkflowDefinition
+    is_valid: bool
+    errors: list[ValidationErrorResponse]
+    attempts: int

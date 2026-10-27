@@ -5,7 +5,7 @@ from pydantic import ValidationError as PydanticValidationError
 from app.engine.registry import NODE_TYPES
 from app.engine.validation import WorkflowValidationResult, validate_workflow
 from app.providers.base import GenerationError, ModelProvider
-from app.schemas.workflow import WorkflowDefinition
+from app.schemas.workflow_definition import WorkflowDefinition
 
 MAX_ATTEMPTS = 2
 

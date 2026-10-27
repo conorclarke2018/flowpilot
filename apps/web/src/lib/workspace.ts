@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { ApiError } from "./api/client";
-import { createWorkspace, getWorkspace } from "./api/workflows";
+import { createWorkspace, getWorkspace } from "./api/workspaces";
 
 const STORAGE_KEY = "flowpilot.workspace_id";
 

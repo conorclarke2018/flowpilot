@@ -9,7 +9,7 @@ from app.engine.executor import execute_workflow
 from app.models.approval import Approval
 from app.models.run import NodeRun, WorkflowRun
 from app.models.workflow import WorkflowVersion
-from app.schemas.workflow import WorkflowDefinition
+from app.schemas.workflow_definition import WorkflowDefinition
 from app.services.workflows import WorkflowNotFoundError, get_workflow
 
 

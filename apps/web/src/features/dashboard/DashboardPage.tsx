@@ -2,7 +2,8 @@ import { Badge, Group, Loader, Paper, SimpleGrid, Stack, Table, Text, Title } fr
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 
-import { listPendingApprovals, listWorkflows } from "../../lib/api/workflows";
+import { listPendingApprovals } from "../../lib/api/approvals";
+import { listWorkflows } from "../../lib/api/workflows";
 import { useWorkspaceId } from "../../lib/workspace";
 
 function StatCard({

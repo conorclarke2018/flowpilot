@@ -3,9 +3,9 @@ import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
-import { decideApproval, listPendingApprovals } from "../../lib/api/workflows";
+import { decideApproval, listPendingApprovals } from "../../lib/api/approvals";
 import { useWorkspaceId } from "../../lib/workspace";
-import type { Approval } from "../../types/workflow";
+import type { Approval } from "../../types/approval";
 
 function ApprovalCard({ approval, workspaceId }: { approval: Approval; workspaceId: string }) {
   const queryClient = useQueryClient();

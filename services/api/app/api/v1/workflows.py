@@ -3,7 +3,7 @@ import uuid
 from fastapi import APIRouter, HTTPException, Query
 
 from app.api.deps import ProviderDep, SessionDep
-from app.schemas.api import (
+from app.schemas.workflow import (
     GenerateWorkflowRequest,
     GenerateWorkflowResponse,
     ValidationErrorResponse,

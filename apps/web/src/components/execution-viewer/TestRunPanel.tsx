@@ -1,8 +1,8 @@
 import { Alert, Badge, Button, Group, Stack, Table, Text, Textarea } from "@mantine/core";
 import { useState } from "react";
 
-import { createRun, getRun, getRunNodes } from "../../lib/api/workflows";
-import type { NodeRun, WorkflowRun } from "../../types/workflow";
+import { createRun, getRun, getRunNodes } from "../../lib/api/runs";
+import type { NodeRun, WorkflowRun } from "../../types/run";
 
 const TERMINAL_STATUSES = new Set(["succeeded", "failed", "cancelled"]);
 

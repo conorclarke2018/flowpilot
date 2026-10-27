@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException
 
 from app.api.deps import SessionDep
 from app.models.workspace import Workspace
-from app.schemas.api import WorkspaceCreateRequest, WorkspaceResponse
+from app.schemas.workspace import WorkspaceCreateRequest, WorkspaceResponse
 
 router = APIRouter(prefix="/workspaces", tags=["workspaces"])
 

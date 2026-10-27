@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.engine.validation import WorkflowValidationResult, validate_workflow
 from app.models.workflow import Workflow, WorkflowVersion
 from app.models.workspace import Workspace
-from app.schemas.workflow import WorkflowDefinition
+from app.schemas.workflow_definition import WorkflowDefinition
 
 
 class WorkflowNotFoundError(Exception):

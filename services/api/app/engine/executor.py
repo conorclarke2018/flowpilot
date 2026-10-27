@@ -8,7 +8,7 @@ from typing import Any
 
 from app.engine.context import ExecutionContext
 from app.nodes.handlers import HANDLERS
-from app.schemas.workflow import WorkflowDefinition
+from app.schemas.workflow_definition import WorkflowDefinition
 
 APPROVAL_NODE_TYPE = "human.approval"
 

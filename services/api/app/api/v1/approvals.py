@@ -3,7 +3,7 @@ import uuid
 from fastapi import APIRouter, HTTPException, Query
 
 from app.api.deps import SessionDep
-from app.schemas.api import ApprovalDecisionRequest, ApprovalResponse
+from app.schemas.approval import ApprovalDecisionRequest, ApprovalResponse
 from app.services import approvals as approval_service
 from app.services.approvals import ApprovalAlreadyDecidedError, ApprovalNotFoundError
 from app.workers.tasks import execute_run_task
