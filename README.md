@@ -3,6 +3,7 @@
 AI-powered workflow automation for small businesses. Users build workflows that combine triggers, deterministic logic, AI processing, and human approval before consequential actions.
 
 Product spec and planning history: [docs/flowpilot-chat-history.md](docs/flowpilot-chat-history.md)
+Architecture decisions and the reasoning behind them: [docs/decisions/](docs/decisions/)
 
 ## Stack
 
@@ -48,4 +49,4 @@ docs/                   Specs and architecture decisions
 
 ## Status
 
-Milestones M1–M5 complete (foundation, workflow contracts/CRUD, execution engine, visual editor, AI integration). See `docs/flowpilot-chat-history.md` for the full roadmap.
+The original 6-week build plan (M1–M6: foundation, workflow contracts/CRUD, execution engine, visual editor, AI integration, human approval gates) is complete. See `docs/flowpilot-chat-history.md` for the full roadmap and `docs/decisions/` for why things were built the way they were.
