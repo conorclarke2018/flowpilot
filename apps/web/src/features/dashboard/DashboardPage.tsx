@@ -78,34 +78,36 @@ export function DashboardPage() {
             .
           </Text>
         ) : (
-          <Table>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>Name</Table.Th>
-                <Table.Th>Status</Table.Th>
-                <Table.Th>Draft revision</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              {workflows.slice(0, 5).map((workflow) => (
-                <Table.Tr key={workflow.id}>
-                  <Table.Td>
-                    <Text component={Link} to={`/workflows/${workflow.id}`} c="blue">
-                      {workflow.name}
-                    </Text>
-                  </Table.Td>
-                  <Table.Td>
-                    {workflow.published_version ? (
-                      <Badge color="green">Published v{workflow.published_version}</Badge>
-                    ) : (
-                      <Badge color="gray">Draft</Badge>
-                    )}
-                  </Table.Td>
-                  <Table.Td>{workflow.draft_revision}</Table.Td>
+          <Table.ScrollContainer minWidth={480}>
+            <Table>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>Name</Table.Th>
+                  <Table.Th>Status</Table.Th>
+                  <Table.Th>Draft revision</Table.Th>
                 </Table.Tr>
-              ))}
-            </Table.Tbody>
-          </Table>
+              </Table.Thead>
+              <Table.Tbody>
+                {workflows.slice(0, 5).map((workflow) => (
+                  <Table.Tr key={workflow.id}>
+                    <Table.Td>
+                      <Text component={Link} to={`/workflows/${workflow.id}`} c="blue">
+                        {workflow.name}
+                      </Text>
+                    </Table.Td>
+                    <Table.Td>
+                      {workflow.published_version ? (
+                        <Badge color="green">Published v{workflow.published_version}</Badge>
+                      ) : (
+                        <Badge color="gray">Draft</Badge>
+                      )}
+                    </Table.Td>
+                    <Table.Td>{workflow.draft_revision}</Table.Td>
+                  </Table.Tr>
+                ))}
+              </Table.Tbody>
+            </Table>
+          </Table.ScrollContainer>
         )}
       </Stack>
 

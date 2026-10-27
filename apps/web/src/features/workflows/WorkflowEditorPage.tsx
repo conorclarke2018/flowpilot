@@ -116,15 +116,22 @@ export function WorkflowEditorPage() {
     (nodeType: NodeType) => {
       nodeCounter += 1;
       const id = `${nodeType.replace(".", "_")}_${nodeCounter}`;
-      setNodes((current) => [
-        ...current,
-        {
-          id,
-          type: WORKFLOW_NODE_TYPE,
-          position: { x: 80 + current.length * 40, y: 80 + current.length * 60 },
-          data: { nodeType, config: {} },
-        },
-      ]);
+      setNodes((current) => {
+        // Lay new nodes out in a wrapping grid (node footprint is ~200x110,
+        // so 260/160 spacing keeps them from overlapping as more are added).
+        const columns = 4;
+        const column = current.length % columns;
+        const row = Math.floor(current.length / columns);
+        return [
+          ...current,
+          {
+            id,
+            type: WORKFLOW_NODE_TYPE,
+            position: { x: 80 + column * 260, y: 80 + row * 160 },
+            data: { nodeType, config: {} },
+          },
+        ];
+      });
     },
     [setNodes],
   );
