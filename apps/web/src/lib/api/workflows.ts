@@ -1,5 +1,6 @@
 import { apiClient } from "./client";
 import type {
+  Approval,
   NodeRun,
   ValidationResponse,
   Workflow,
@@ -79,4 +80,21 @@ export function getRun(workspaceId: string, runId: string) {
 
 export function getRunNodes(workspaceId: string, runId: string) {
   return apiClient.get<NodeRun[]>(`/runs/${runId}/nodes`, { workspace_id: workspaceId });
+}
+
+export function listPendingApprovals(workspaceId: string) {
+  return apiClient.get<Approval[]>("/approvals", { workspace_id: workspaceId });
+}
+
+export function decideApproval(
+  workspaceId: string,
+  approvalId: string,
+  decision: "approved" | "rejected",
+  payload?: Record<string, unknown>,
+) {
+  return apiClient.post<Approval>(
+    `/approvals/${approvalId}/decision`,
+    { decision, payload },
+    { workspace_id: workspaceId },
+  );
 }

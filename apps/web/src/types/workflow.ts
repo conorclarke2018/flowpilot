@@ -68,7 +68,13 @@ export interface WorkflowVersion {
   created_at: string;
 }
 
-export type RunStatus = "queued" | "running" | "succeeded" | "failed" | "cancelled";
+export type RunStatus =
+  | "queued"
+  | "running"
+  | "waiting_for_approval"
+  | "succeeded"
+  | "failed"
+  | "cancelled";
 
 export interface WorkflowRun {
   id: string;
@@ -97,4 +103,17 @@ export interface Workspace {
   id: string;
   name: string;
   created_at: string;
+}
+
+export type ApprovalStatus = "pending" | "approved" | "rejected";
+
+export interface Approval {
+  id: string;
+  workflow_run_id: string;
+  node_id: string;
+  status: ApprovalStatus;
+  proposed_payload: Record<string, unknown>;
+  decided_payload: Record<string, unknown> | null;
+  created_at: string;
+  decided_at: string | null;
 }

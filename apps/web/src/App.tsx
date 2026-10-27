@@ -7,6 +7,7 @@ import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
 
 import { AppShellLayout } from "./components/layout/AppShellLayout";
+import { ApprovalsPage } from "./features/approvals/ApprovalsPage";
 import { DashboardPage } from "./features/dashboard/DashboardPage";
 import { WorkflowEditorPage } from "./features/workflows/WorkflowEditorPage";
 import { WorkflowsPage } from "./features/workflows/WorkflowsPage";
@@ -24,6 +25,7 @@ export default function App() {
               <Route path="/" element={<DashboardPage />} />
               <Route path="/workflows" element={<WorkflowsPage />} />
               <Route path="/workflows/:workflowId" element={<WorkflowEditorPage />} />
+              <Route path="/approvals" element={<ApprovalsPage />} />
             </Route>
           </Routes>
         </BrowserRouter>

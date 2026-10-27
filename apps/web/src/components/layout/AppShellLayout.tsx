@@ -4,6 +4,7 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 const NAV_ITEMS = [
   { label: "Dashboard", path: "/" },
   { label: "Workflows", path: "/workflows" },
+  { label: "Approvals", path: "/approvals" },
 ];
 
 export function AppShellLayout() {
