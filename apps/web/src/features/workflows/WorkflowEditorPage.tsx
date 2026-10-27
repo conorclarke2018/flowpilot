@@ -1,6 +1,6 @@
 import "@xyflow/react/dist/style.css";
 
-import { Alert, Badge, Button, Group, Loader, Stack, Text } from "@mantine/core";
+import { Alert, Badge, Button, Group, Loader, Stack, Text, Tooltip } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -257,9 +257,19 @@ export function WorkflowEditorPage() {
           <Button size="sm" variant="light" loading={validateMutation.isPending} onClick={() => validateMutation.mutate()}>
             Validate
           </Button>
-          <Button size="sm" loading={publishMutation.isPending} onClick={() => publishMutation.mutate()}>
-            Publish
-          </Button>
+          <Tooltip
+            label="Add at least a trigger node before publishing"
+            disabled={nodes.length > 0}
+          >
+            <Button
+              size="sm"
+              loading={publishMutation.isPending}
+              disabled={nodes.length === 0}
+              onClick={() => publishMutation.mutate()}
+            >
+              Publish
+            </Button>
+          </Tooltip>
         </Group>
       </Group>
 
@@ -278,7 +288,27 @@ export function WorkflowEditorPage() {
       <Group gap={0} style={{ flex: 1, minHeight: 0 }} align="stretch">
         <NodePalette onAdd={addNode} />
 
-        <div style={{ flex: 1, height: "100%" }}>
+        <div style={{ flex: 1, height: "100%", position: "relative" }}>
+          {nodes.length === 0 && (
+            <Stack
+              align="center"
+              justify="center"
+              gap={4}
+              style={{
+                position: "absolute",
+                inset: 0,
+                zIndex: 5,
+                pointerEvents: "none",
+              }}
+            >
+              <Text c="dimmed" size="sm">
+                This workflow is empty.
+              </Text>
+              <Text c="dimmed" size="xs">
+                Add a node from the left, or use Import JSON above.
+              </Text>
+            </Stack>
+          )}
           <ReactFlow
             nodes={nodes}
             edges={edges}
