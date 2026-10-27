@@ -3,3 +3,12 @@ __pycache__
 *.pyc
 .pytest_cache
 .ruff_cache
+
+.env
+.env.*
+!.env.example
+
+# ruflo/claude-flow tooling artifacts
+.claude-flow
+.swarm
+ruvector.db

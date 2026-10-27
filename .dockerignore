@@ -1,4 +1,22 @@
+.git
+.github
+.env
+.env.*
+!.env.example
+docs
+*.md
+scripts
+infra
+
 node_modules
 apps/web/node_modules
 apps/web/dist
 services/api/.venv
+services/api/__pycache__
+services/api/.pytest_cache
+services/api/.ruff_cache
+
+# ruflo/claude-flow tooling artifacts, scattered into many subdirs
+**/.claude-flow
+**/.swarm
+**/ruvector.db
