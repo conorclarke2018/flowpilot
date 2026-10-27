@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # FlowPilot
 
 AI-powered workflow automation for small businesses. Users build workflows that combine triggers, deterministic logic, AI processing, and human approval before consequential actions.
@@ -33,7 +32,4 @@ docs/                   Specs and architecture decisions
 
 ## Status
 
-Milestone M1 (foundation) complete. Milestone M2 (workflow contracts, validation, CRUD) in progress — see `docs/flowpilot-chat-history.md` for the full roadmap.
-=======
-# flowpilot
->>>>>>> 87635429c1758020897117a12c001cbaff59e7e3
+Milestones M1–M5 complete (foundation, workflow contracts/CRUD, execution engine, visual editor, AI integration). See `docs/flowpilot-chat-history.md` for the full roadmap.
