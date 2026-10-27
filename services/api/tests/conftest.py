@@ -5,7 +5,7 @@ os.environ.setdefault("ENVIRONMENT", "test")
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
@@ -22,6 +22,16 @@ def db_sessionmaker() -> Generator[sessionmaker[Session]]:
     engine = create_engine(
         "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
     )
+
+    # SQLite ignores FK constraints (including ondelete=CASCADE) unless this
+    # pragma is set per-connection — without it, cascade-delete tests would
+    # pass here regardless of whether the real migration is correct.
+    @event.listens_for(engine, "connect")
+    def _enable_foreign_keys(dbapi_connection, _):
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
+
     Base.metadata.create_all(engine)
     testing_session_local = sessionmaker(bind=engine, autoflush=False, autocommit=False)
     try:

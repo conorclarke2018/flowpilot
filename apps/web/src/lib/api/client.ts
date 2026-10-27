@@ -44,4 +44,6 @@ export const apiClient = {
     request<T>(path, { method: "POST", body, params }),
   put: <T>(path: string, body?: unknown, params?: Record<string, string>) =>
     request<T>(path, { method: "PUT", body, params }),
+  delete: <T>(path: string, params?: Record<string, string>) =>
+    request<T>(path, { method: "DELETE", params }),
 };

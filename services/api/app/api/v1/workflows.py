@@ -80,6 +80,16 @@ async def update_workflow_draft(
     return WorkflowResponse.model_validate(workflow, from_attributes=True)
 
 
+@router.delete("/{workflow_id}", status_code=204)
+async def delete_workflow(
+    workflow_id: uuid.UUID, db: SessionDep, workspace_id: uuid.UUID = Query(...)
+) -> None:
+    try:
+        workflow_service.delete_workflow(db, workspace_id=workspace_id, workflow_id=workflow_id)
+    except WorkflowNotFoundError:
+        raise HTTPException(status_code=404, detail="Workflow not found") from None
+
+
 @router.post("/{workflow_id}/validate", response_model=ValidationResponse)
 async def validate_workflow_draft(
     workflow_id: uuid.UUID, db: SessionDep, workspace_id: uuid.UUID = Query(...)

@@ -63,3 +63,7 @@ export function generateWorkflow(workspaceId: string, workflowId: string, prompt
     { workspace_id: workspaceId },
   );
 }
+
+export function deleteWorkflow(workspaceId: string, workflowId: string) {
+  return apiClient.delete<void>(`/workflows/${workflowId}`, { workspace_id: workspaceId });
+}

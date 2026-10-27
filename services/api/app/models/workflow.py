@@ -28,7 +28,9 @@ class Workflow(Base):
     )
 
     versions: Mapped[list["WorkflowVersion"]] = relationship(
-        back_populates="workflow", order_by="WorkflowVersion.version"
+        back_populates="workflow",
+        order_by="WorkflowVersion.version",
+        cascade="all, delete-orphan",
     )
 
 
@@ -38,7 +40,7 @@ class WorkflowVersion(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
     workflow_id: Mapped[uuid.UUID] = mapped_column(
-        Uuid, ForeignKey("workflows.id"), nullable=False, index=True
+        Uuid, ForeignKey("workflows.id", ondelete="CASCADE"), nullable=False, index=True
     )
     version: Mapped[int] = mapped_column(Integer, nullable=False)
     definition: Mapped[dict] = mapped_column(JSON, nullable=False)

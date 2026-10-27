@@ -16,7 +16,7 @@ class WorkflowRun(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
     workflow_id: Mapped[uuid.UUID] = mapped_column(
-        Uuid, ForeignKey("workflows.id"), nullable=False, index=True
+        Uuid, ForeignKey("workflows.id", ondelete="CASCADE"), nullable=False, index=True
     )
     workflow_version: Mapped[int] = mapped_column(Integer, nullable=False)
     status: Mapped[str] = mapped_column(String(32), nullable=False, default="queued")
@@ -39,7 +39,7 @@ class NodeRun(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
     workflow_run_id: Mapped[uuid.UUID] = mapped_column(
-        Uuid, ForeignKey("workflow_runs.id"), nullable=False, index=True
+        Uuid, ForeignKey("workflow_runs.id", ondelete="CASCADE"), nullable=False, index=True
     )
     node_id: Mapped[str] = mapped_column(String(255), nullable=False)
     status: Mapped[str] = mapped_column(String(32), nullable=False)

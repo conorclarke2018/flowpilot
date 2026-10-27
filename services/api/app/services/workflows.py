@@ -88,6 +88,12 @@ def validate_draft(
     return validate_workflow(definition)
 
 
+def delete_workflow(db: Session, *, workspace_id: uuid.UUID, workflow_id: uuid.UUID) -> None:
+    workflow = get_workflow(db, workspace_id=workspace_id, workflow_id=workflow_id)
+    db.delete(workflow)
+    db.commit()
+
+
 def publish_workflow(
     db: Session, *, workspace_id: uuid.UUID, workflow_id: uuid.UUID
 ) -> WorkflowVersion:
