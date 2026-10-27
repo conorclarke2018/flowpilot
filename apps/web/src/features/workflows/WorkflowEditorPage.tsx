@@ -169,6 +169,9 @@ export function WorkflowEditorPage() {
       queryClient.setQueryData(["workflow", workspaceId, workflowId], workflow);
       notifications.show({ message: "Draft saved", color: "green" });
     },
+    onError: () => {
+      notifications.show({ message: "Could not save draft", color: "red" });
+    },
   });
 
   const validateMutation = useMutation({
@@ -182,6 +185,9 @@ export function WorkflowEditorPage() {
         message: result.is_valid ? "Workflow is valid" : "Workflow has validation errors",
         color: result.is_valid ? "green" : "red",
       });
+    },
+    onError: () => {
+      notifications.show({ message: "Could not validate workflow", color: "red" });
     },
   });
 

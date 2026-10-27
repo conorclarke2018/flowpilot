@@ -29,6 +29,18 @@ def _create_workspace(client: TestClient) -> str:
     return response.json()["id"]
 
 
+def test_create_workflow_with_nonexistent_workspace_returns_404(client: TestClient) -> None:
+    response = client.post(
+        "/api/v1/workflows",
+        json={
+            "workspace_id": "00000000-0000-0000-0000-000000000000",
+            "name": "Triage",
+            "definition": BLANK_DEFINITION,
+        },
+    )
+    assert response.status_code == 404
+
+
 def test_create_and_get_workflow(client: TestClient) -> None:
     workspace_id = _create_workspace(client)
 

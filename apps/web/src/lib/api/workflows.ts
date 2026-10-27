@@ -14,6 +14,10 @@ export function createWorkspace(name: string) {
   return apiClient.post<Workspace>("/workspaces", { name });
 }
 
+export function getWorkspace(workspaceId: string) {
+  return apiClient.get<Workspace>(`/workspaces/${workspaceId}`);
+}
+
 export function listWorkflows(workspaceId: string) {
   return apiClient.get<Workflow[]>("/workflows", { workspace_id: workspaceId });
 }

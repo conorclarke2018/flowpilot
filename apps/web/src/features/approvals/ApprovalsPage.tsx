@@ -34,6 +34,12 @@ function ApprovalCard({ approval, workspaceId }: { approval: Approval; workspace
         color: decision === "approved" ? "green" : "red",
       });
     },
+    onError: (err) => {
+      // the invalid-JSON case already shows an inline field error; only
+      // toast for real failures (network/API) so we don't double-report.
+      if (err instanceof Error && err.message === "invalid json") return;
+      notifications.show({ message: "Could not record decision", color: "red" });
+    },
   });
 
   return (

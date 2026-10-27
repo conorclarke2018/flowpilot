@@ -1,4 +1,5 @@
 import { Badge, Button, Group, Loader, Stack, Table, Title } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 
@@ -29,6 +30,9 @@ export function WorkflowsPage() {
     onSuccess: (workflow) => {
       queryClient.invalidateQueries({ queryKey: ["workflows", workspaceId] });
       navigate(`/workflows/${workflow.id}`);
+    },
+    onError: () => {
+      notifications.show({ message: "Could not create workflow", color: "red" });
     },
   });
 

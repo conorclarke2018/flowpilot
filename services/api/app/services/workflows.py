@@ -5,10 +5,15 @@ from sqlalchemy.orm import Session
 
 from app.engine.validation import WorkflowValidationResult, validate_workflow
 from app.models.workflow import Workflow, WorkflowVersion
+from app.models.workspace import Workspace
 from app.schemas.workflow import WorkflowDefinition
 
 
 class WorkflowNotFoundError(Exception):
+    pass
+
+
+class WorkspaceNotFoundError(Exception):
     pass
 
 
@@ -26,6 +31,9 @@ def create_workflow(
     description: str | None,
     definition: WorkflowDefinition,
 ) -> Workflow:
+    if db.get(Workspace, workspace_id) is None:
+        raise WorkspaceNotFoundError(str(workspace_id))
+
     workflow = Workflow(
         workspace_id=workspace_id,
         name=name,

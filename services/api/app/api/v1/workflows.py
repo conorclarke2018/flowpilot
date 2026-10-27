@@ -15,20 +15,27 @@ from app.schemas.api import (
 )
 from app.services import workflows as workflow_service
 from app.services.generation import generate_workflow_proposal
-from app.services.workflows import PublishValidationError, WorkflowNotFoundError
+from app.services.workflows import (
+    PublishValidationError,
+    WorkflowNotFoundError,
+    WorkspaceNotFoundError,
+)
 
 router = APIRouter(prefix="/workflows", tags=["workflows"])
 
 
 @router.post("", response_model=WorkflowResponse, status_code=201)
 async def create_workflow(payload: WorkflowCreateRequest, db: SessionDep) -> WorkflowResponse:
-    workflow = workflow_service.create_workflow(
-        db,
-        workspace_id=payload.workspace_id,
-        name=payload.name,
-        description=payload.description,
-        definition=payload.definition,
-    )
+    try:
+        workflow = workflow_service.create_workflow(
+            db,
+            workspace_id=payload.workspace_id,
+            name=payload.name,
+            description=payload.description,
+            definition=payload.definition,
+        )
+    except WorkspaceNotFoundError:
+        raise HTTPException(status_code=404, detail="Workspace not found") from None
     return WorkflowResponse.model_validate(workflow, from_attributes=True)
 
 
