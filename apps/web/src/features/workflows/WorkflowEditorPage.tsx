@@ -19,6 +19,7 @@ import {
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
+import { ImportWorkflowModal } from "../../components/workflow-editor/ImportWorkflowModal";
 import { NodeConfigPanel } from "../../components/workflow-editor/NodeConfigPanel";
 import { NodePalette } from "../../components/workflow-editor/NodePalette";
 import { nodeTypes, WORKFLOW_NODE_TYPE } from "../../components/workflow-editor/nodeTypes";
@@ -96,6 +97,7 @@ export function WorkflowEditorPage() {
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<ValidationError[] | null>(null);
+  const [importOpened, setImportOpened] = useState(false);
 
   useEffect(() => {
     if (!workflowQuery.data) return;
@@ -145,6 +147,18 @@ export function WorkflowEditorPage() {
       );
     },
     [setNodes],
+  );
+
+  const handleImport = useCallback(
+    (definition: WorkflowDefinition) => {
+      const { nodes: importedNodes, edges: importedEdges } = definitionToFlow(definition);
+      setNodes(importedNodes);
+      setEdges(importedEdges);
+      setSelectedNodeId(null);
+      setValidationErrors(null);
+      notifications.show({ message: "Workflow imported — review, then save", color: "green" });
+    },
+    [setNodes, setEdges],
   );
 
   const deleteNode = useCallback(
@@ -234,6 +248,9 @@ export function WorkflowEditorPage() {
           )}
         </Group>
         <Group gap="xs">
+          <Button size="sm" variant="subtle" onClick={() => setImportOpened(true)}>
+            Import JSON
+          </Button>
           <Button size="sm" variant="light" loading={saveMutation.isPending} onClick={() => saveMutation.mutate()}>
             Save draft
           </Button>
@@ -299,6 +316,12 @@ export function WorkflowEditorPage() {
           isPublished={Boolean(workflowQuery.data.published_version)}
         />
       </Group>
+
+      <ImportWorkflowModal
+        opened={importOpened}
+        onClose={() => setImportOpened(false)}
+        onImport={handleImport}
+      />
     </Stack>
   );
 }

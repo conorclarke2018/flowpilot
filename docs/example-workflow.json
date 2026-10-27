@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.0",
+  "name": "Customer Enquiry Triage",
+  "nodes": [
+    {
+      "id": "trigger_1",
+      "type": "trigger.manual",
+      "position": { "x": 0, "y": 0 },
+      "config": {}
+    },
+    {
+      "id": "classify_1",
+      "type": "ai.classify",
+      "position": { "x": 260, "y": 0 },
+      "config": {
+        "prompt": "Classify this customer enquiry: $.trigger.message",
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "category": {
+              "type": "string",
+              "enum": ["delivery", "billing", "product", "other"]
+            },
+            "priority": {
+              "type": "string",
+              "enum": ["low", "normal", "high"]
+            },
+            "summary": { "type": "string" }
+          },
+          "required": ["category", "priority", "summary"],
+          "additionalProperties": false
+        }
+      }
+    },
+    {
+      "id": "approval_1",
+      "type": "human.approval",
+      "position": { "x": 520, "y": 0 },
+      "config": {
+        "payload": {
+          "summary": "$.classify_1.summary",
+          "category": "$.classify_1.category"
+        }
+      }
+    },
+    {
+      "id": "email_1",
+      "type": "action.mock_email",
+      "position": { "x": 780, "y": 0 },
+      "config": {
+        "to": "$.trigger.customer_email",
+        "subject": "Re: your enquiry",
+        "body": "$.approval_1.summary"
+      }
+    }
+  ],
+  "edges": [
+    { "id": "edge_1", "source": "trigger_1", "source_handle": "output", "target": "classify_1", "target_handle": "input" },
+    { "id": "edge_2", "source": "classify_1", "source_handle": "output", "target": "approval_1", "target_handle": "input" },
+    { "id": "edge_3", "source": "approval_1", "source_handle": "output", "target": "email_1", "target_handle": "input" }
+  ]
+}
