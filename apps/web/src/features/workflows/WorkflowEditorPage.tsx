@@ -19,6 +19,7 @@ import {
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
+import { GenerateWorkflowModal } from "../../components/workflow-editor/GenerateWorkflowModal";
 import { ImportWorkflowModal } from "../../components/workflow-editor/ImportWorkflowModal";
 import { NodeConfigPanel } from "../../components/workflow-editor/NodeConfigPanel";
 import { NodePalette } from "../../components/workflow-editor/NodePalette";
@@ -98,6 +99,7 @@ export function WorkflowEditorPage() {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<ValidationError[] | null>(null);
   const [importOpened, setImportOpened] = useState(false);
+  const [generateOpened, setGenerateOpened] = useState(false);
   const [name, setName] = useState("");
 
   useEffect(() => {
@@ -151,16 +153,30 @@ export function WorkflowEditorPage() {
     [setNodes],
   );
 
-  const handleImport = useCallback(
+  const loadDefinitionOntoCanvas = useCallback(
     (definition: WorkflowDefinition) => {
-      const { nodes: importedNodes, edges: importedEdges } = definitionToFlow(definition);
-      setNodes(importedNodes);
-      setEdges(importedEdges);
+      const { nodes: loadedNodes, edges: loadedEdges } = definitionToFlow(definition);
+      setNodes(loadedNodes);
+      setEdges(loadedEdges);
       setSelectedNodeId(null);
       setValidationErrors(null);
-      notifications.show({ message: "Workflow imported — review, then save", color: "green" });
     },
     [setNodes, setEdges],
+  );
+
+  const handleImport = useCallback(
+    (definition: WorkflowDefinition) => {
+      loadDefinitionOntoCanvas(definition);
+      notifications.show({ message: "Workflow imported — review, then save", color: "green" });
+    },
+    [loadDefinitionOntoCanvas],
+  );
+
+  const handleGenerated = useCallback(
+    (definition: WorkflowDefinition) => {
+      loadDefinitionOntoCanvas(definition);
+    },
+    [loadDefinitionOntoCanvas],
   );
 
   const deleteNode = useCallback(
@@ -264,6 +280,9 @@ export function WorkflowEditorPage() {
           )}
         </Group>
         <Group gap="xs">
+          <Button size="sm" variant="subtle" onClick={() => setGenerateOpened(true)}>
+            Generate with AI
+          </Button>
           <Button size="sm" variant="subtle" onClick={() => setImportOpened(true)}>
             Import JSON
           </Button>
@@ -367,6 +386,14 @@ export function WorkflowEditorPage() {
         opened={importOpened}
         onClose={() => setImportOpened(false)}
         onImport={handleImport}
+      />
+
+      <GenerateWorkflowModal
+        opened={generateOpened}
+        onClose={() => setGenerateOpened(false)}
+        workspaceId={workspaceId}
+        workflowId={workflowId as string}
+        onGenerated={handleGenerated}
       />
     </Stack>
   );

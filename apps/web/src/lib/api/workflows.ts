@@ -1,5 +1,6 @@
 import { apiClient } from "./client";
 import type {
+  GenerateWorkflowResponse,
   ValidationResponse,
   Workflow,
   WorkflowDefinition,
@@ -51,6 +52,14 @@ export function publishWorkflow(workspaceId: string, workflowId: string) {
   return apiClient.post<WorkflowVersion>(
     `/workflows/${workflowId}/publish`,
     undefined,
+    { workspace_id: workspaceId },
+  );
+}
+
+export function generateWorkflow(workspaceId: string, workflowId: string, prompt: string) {
+  return apiClient.post<GenerateWorkflowResponse>(
+    `/workflows/${workflowId}/generate`,
+    { prompt },
     { workspace_id: workspaceId },
   );
 }

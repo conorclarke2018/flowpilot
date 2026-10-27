@@ -67,3 +67,10 @@ export interface WorkflowVersion {
   definition: WorkflowDefinition;
   created_at: string;
 }
+
+export interface GenerateWorkflowResponse {
+  definition: WorkflowDefinition;
+  is_valid: boolean;
+  errors: ValidationError[];
+  attempts: number;
+}
