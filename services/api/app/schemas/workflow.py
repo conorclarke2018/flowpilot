@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.schemas.workflow_definition import WorkflowDefinition
 
@@ -15,6 +15,7 @@ class WorkflowCreateRequest(BaseModel):
 
 class WorkflowUpdateRequest(BaseModel):
     definition: WorkflowDefinition
+    name: str | None = Field(default=None, min_length=1)
 
 
 class WorkflowResponse(BaseModel):

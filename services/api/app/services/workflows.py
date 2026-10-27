@@ -68,10 +68,13 @@ def update_draft(
     workspace_id: uuid.UUID,
     workflow_id: uuid.UUID,
     definition: WorkflowDefinition,
+    name: str | None = None,
 ) -> Workflow:
     workflow = get_workflow(db, workspace_id=workspace_id, workflow_id=workflow_id)
     workflow.draft_definition = definition.model_dump(mode="json")
     workflow.draft_revision += 1
+    if name is not None:
+        workflow.name = name
     db.commit()
     db.refresh(workflow)
     return workflow

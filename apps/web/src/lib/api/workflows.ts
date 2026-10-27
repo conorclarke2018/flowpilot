@@ -30,10 +30,11 @@ export function updateWorkflowDraft(
   workspaceId: string,
   workflowId: string,
   definition: WorkflowDefinition,
+  name?: string,
 ) {
   return apiClient.put<Workflow>(
     `/workflows/${workflowId}`,
-    { definition },
+    { definition, name },
     { workspace_id: workspaceId },
   );
 }

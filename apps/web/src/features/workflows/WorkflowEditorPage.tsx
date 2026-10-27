@@ -1,6 +1,6 @@
 import "@xyflow/react/dist/style.css";
 
-import { Alert, Badge, Button, Group, Loader, Stack, Text, Tooltip } from "@mantine/core";
+import { Alert, Badge, Button, Group, Loader, Stack, Text, TextInput, Tooltip } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -98,6 +98,7 @@ export function WorkflowEditorPage() {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<ValidationError[] | null>(null);
   const [importOpened, setImportOpened] = useState(false);
+  const [name, setName] = useState("");
 
   useEffect(() => {
     if (!workflowQuery.data) return;
@@ -106,6 +107,7 @@ export function WorkflowEditorPage() {
     );
     setNodes(initialNodes);
     setEdges(initialEdges);
+    setName(workflowQuery.data.name);
   }, [workflowQuery.data, setNodes, setEdges]);
 
   const onConnect: OnConnect = useCallback(
@@ -172,12 +174,14 @@ export function WorkflowEditorPage() {
 
   const saveMutation = useMutation({
     mutationFn: () => {
-      const definition = flowToDefinition(
-        workflowQuery.data?.name ?? "Untitled workflow",
-        nodes,
-        edges,
+      const trimmedName = name.trim() || "Untitled workflow";
+      const definition = flowToDefinition(trimmedName, nodes, edges);
+      return updateWorkflowDraft(
+        workspaceId as string,
+        workflowId as string,
+        definition,
+        trimmedName,
       );
-      return updateWorkflowDraft(workspaceId as string, workflowId as string, definition);
     },
     onSuccess: (workflow) => {
       queryClient.setQueryData(["workflow", workspaceId, workflowId], workflow);
@@ -240,7 +244,19 @@ export function WorkflowEditorPage() {
     <Stack h="calc(100vh - 100px)" gap="xs">
       <Group justify="space-between">
         <Group gap="xs">
-          <Text fw={600}>{workflowQuery.data.name}</Text>
+          <TextInput
+            value={name}
+            onChange={(event) => setName(event.currentTarget.value)}
+            onBlur={() => {
+              if (!name.trim()) setName(workflowQuery.data?.name ?? "Untitled workflow");
+            }}
+            placeholder="Workflow name"
+            variant="unstyled"
+            fw={600}
+            size="md"
+            aria-label="Workflow name"
+            styles={{ input: { fontWeight: 600, width: 260 } }}
+          />
           {workflowQuery.data.published_version ? (
             <Badge color="green">Published v{workflowQuery.data.published_version}</Badge>
           ) : (

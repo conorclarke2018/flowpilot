@@ -73,6 +73,7 @@ async def update_workflow_draft(
             workspace_id=workspace_id,
             workflow_id=workflow_id,
             definition=payload.definition,
+            name=payload.name,
         )
     except WorkflowNotFoundError:
         raise HTTPException(status_code=404, detail="Workflow not found") from None

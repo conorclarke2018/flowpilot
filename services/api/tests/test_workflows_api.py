@@ -98,6 +98,45 @@ def test_update_draft_increments_revision(client: TestClient) -> None:
     assert update_response.json()["draft_definition"]["nodes"][0]["id"] == "trigger_1"
 
 
+def test_update_draft_can_rename_workflow(client: TestClient) -> None:
+    workspace_id = _create_workspace(client)
+    create_response = client.post(
+        "/api/v1/workflows",
+        json={"workspace_id": workspace_id, "name": "Triage", "definition": BLANK_DEFINITION},
+    )
+    workflow_id = create_response.json()["id"]
+
+    rename_response = client.put(
+        f"/api/v1/workflows/{workflow_id}",
+        params={"workspace_id": workspace_id},
+        json={"definition": BLANK_DEFINITION, "name": "Customer Enquiry Triage"},
+    )
+    assert rename_response.status_code == 200
+    assert rename_response.json()["name"] == "Customer Enquiry Triage"
+
+    get_response = client.get(
+        f"/api/v1/workflows/{workflow_id}", params={"workspace_id": workspace_id}
+    )
+    assert get_response.json()["name"] == "Customer Enquiry Triage"
+
+
+def test_update_draft_without_name_keeps_existing_name(client: TestClient) -> None:
+    workspace_id = _create_workspace(client)
+    create_response = client.post(
+        "/api/v1/workflows",
+        json={"workspace_id": workspace_id, "name": "Triage", "definition": BLANK_DEFINITION},
+    )
+    workflow_id = create_response.json()["id"]
+
+    update_response = client.put(
+        f"/api/v1/workflows/{workflow_id}",
+        params={"workspace_id": workspace_id},
+        json={"definition": BLANK_DEFINITION},
+    )
+    assert update_response.status_code == 200
+    assert update_response.json()["name"] == "Triage"
+
+
 def test_validate_invalid_draft_reports_errors(client: TestClient) -> None:
     workspace_id = _create_workspace(client)
     create_response = client.post(
