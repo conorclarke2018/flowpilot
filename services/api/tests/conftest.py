@@ -11,6 +11,7 @@ from sqlalchemy.pool import StaticPool
 
 from app.db.session import Base, get_db
 from app.main import app
+from app.models import approval as _approval_models  # noqa: F401
 from app.models import run as _run_models  # noqa: F401
 from app.models import workflow as _workflow_models  # noqa: F401
 from app.models import workspace as _workspace_models  # noqa: F401

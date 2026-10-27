@@ -6,6 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.engine.executor import execute_workflow
+from app.models.approval import Approval
 from app.models.run import NodeRun, WorkflowRun
 from app.models.workflow import WorkflowVersion
 from app.schemas.workflow import WorkflowDefinition
@@ -55,6 +56,26 @@ def create_run(
     return run
 
 
+def _known_node_outputs(db: Session, *, run_id: uuid.UUID) -> dict[str, dict[str, Any]]:
+    outputs: dict[str, dict[str, Any]] = {}
+
+    node_runs = db.scalars(
+        select(NodeRun).where(NodeRun.workflow_run_id == run_id, NodeRun.status == "succeeded")
+    )
+    for node_run in node_runs:
+        outputs[node_run.node_id] = node_run.output or {}
+
+    approved = db.scalars(
+        select(Approval).where(
+            Approval.workflow_run_id == run_id, Approval.status == "approved"
+        )
+    )
+    for approval in approved:
+        outputs[approval.node_id] = approval.decided_payload or {}
+
+    return outputs
+
+
 def execute_run(db: Session, *, run_id: uuid.UUID) -> WorkflowRun:
     run = db.get(WorkflowRun, run_id)
     if run is None:
@@ -64,7 +85,8 @@ def execute_run(db: Session, *, run_id: uuid.UUID) -> WorkflowRun:
         return run
 
     run.status = "running"
-    run.started_at = datetime.now(UTC)
+    if run.started_at is None:
+        run.started_at = datetime.now(UTC)
     db.commit()
 
     version = db.scalars(
@@ -74,8 +96,9 @@ def execute_run(db: Session, *, run_id: uuid.UUID) -> WorkflowRun:
         )
     ).first()
     definition = WorkflowDefinition.model_validate(version.definition)
+    known_outputs = _known_node_outputs(db, run_id=run.id)
 
-    result = execute_workflow(definition, run.input)
+    result = execute_workflow(definition, run.input, known_node_outputs=known_outputs)
 
     for node_result in result.node_results:
         db.add(
@@ -90,11 +113,30 @@ def execute_run(db: Session, *, run_id: uuid.UUID) -> WorkflowRun:
             )
         )
 
-    run.status = result.status
-    run.finished_at = datetime.now(UTC)
-    if result.status == "failed":
-        failed_node = next(r for r in result.node_results if r.status == "failed")
-        run.error = failed_node.error
+    if result.status == "waiting_for_approval":
+        existing_pending = db.scalars(
+            select(Approval).where(
+                Approval.workflow_run_id == run.id,
+                Approval.node_id == result.pending_approval_node_id,
+                Approval.status == "pending",
+            )
+        ).first()
+        if existing_pending is None:
+            db.add(
+                Approval(
+                    workflow_run_id=run.id,
+                    node_id=result.pending_approval_node_id,
+                    proposed_payload=result.pending_approval_payload or {},
+                    status="pending",
+                )
+            )
+        run.status = "waiting_for_approval"
+    else:
+        run.status = result.status
+        run.finished_at = datetime.now(UTC)
+        if result.status == "failed":
+            failed_node = next(r for r in result.node_results if r.status == "failed")
+            run.error = failed_node.error
 
     db.commit()
     db.refresh(run)
